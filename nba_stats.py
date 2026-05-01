@@ -2,8 +2,12 @@ from nba_api.stats.endpoints import leagueleaders
 import pandas as pd
 import plotly.express as px
 from dash import Dash, dcc, html, Input, Output, State
+import sqlite3
 
-# Pull the data once
+# Connect to database (creates nba_stats.db file if it doesn't exist)
+conn = sqlite3.connect('nba_stats.db')
+
+# Pull fresh data from API and save to database
 df = leagueleaders.LeagueLeaders().get_data_frames()[0]
 
 # Calculate per game stats
@@ -12,6 +16,12 @@ df['AST_PG'] = (df['AST'] / df['GP']).round(2)
 df['REB_PG'] = (df['REB'] / df['GP']).round(2)
 df['STL_PG'] = (df['STL'] / df['GP']).round(2)
 df['BLK_PG'] = (df['BLK'] / df['GP']).round(2)
+
+# Save to SQL database
+df.to_sql('players', conn, if_exists='replace', index=False)
+
+# From this point on, read from the database instead of the API
+df = pd.read_sql('SELECT * FROM players', conn)
 
 # Team colors
 team_colors = {
@@ -93,6 +103,7 @@ app.layout = html.Div([
     dcc.Graph(id='bar-chart')
 ])
 
+
 @app.callback(
     Output('bar-chart', 'figure'),
     Input('generate-button', 'n_clicks'),
@@ -105,7 +116,13 @@ def update_chart(n_clicks, stat, type, count):
         return {}
 
     col = f'{stat}_PG' if type == 'per_game' else stat
-    top_n = df.nlargest(count, col)
+
+    # Open a new connection inside the callback
+    local_conn = sqlite3.connect('nba_stats.db')
+    query = f'SELECT * FROM players ORDER BY {col} DESC LIMIT {count}'
+    top_n = pd.read_sql(query, local_conn)
+    local_conn.close()
+
     color_map = dict(zip(top_n['PLAYER'], top_n['TEAM'].map(team_colors)))
 
     fig = px.bar(top_n, x='PLAYER', y=col,
@@ -115,6 +132,7 @@ def update_chart(n_clicks, stat, type, count):
                  color_discrete_map=color_map)
     fig.update_layout(showlegend=False)
     return fig
+
 
 if __name__ == '__main__':
     app.run(debug=True)

@@ -11,6 +11,8 @@ A Python web app that visualizes NBA player statistics using real-time data.
 ## Built With
 - Python
 - Pandas
+- NumPy
+- SQL (sqlite3)
 - Plotly
 - Dash
 - nba_api
@@ -25,4 +27,12 @@ A Python web app that visualizes NBA player statistics using real-time data.
 4. Open your browser and go to http://127.0.0.1:8050
 
 ## Status
-Work in progress — planning to add predictive modeling for player stats and game outcomes.
+Work in progress — actively being developed.
+
+## Roadmap
+- Predictive modeling for player stats and game outcomes
+- Line graphs to track and compare stat changes throughout the season
+- Team stats (win rate, offensive/defensive rating, etc.)
+- Customizable colors
+- Downloadable graphs
+- Cleaner UI
