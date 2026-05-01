@@ -5,7 +5,7 @@ from dash import Dash, dcc, html, Input, Output, State
 import sqlite3
 
 # Connect to database (creates nba_stats.db file if it doesn't exist)
-conn = sqlite3.connect('nba_stats.db')
+conn = sqlite3.connect('.venv/nba_stats.db')
 
 # Pull fresh data from API and save to database
 df = leagueleaders.LeagueLeaders().get_data_frames()[0]
@@ -118,7 +118,7 @@ def update_chart(n_clicks, stat, type, count):
     col = f'{stat}_PG' if type == 'per_game' else stat
 
     # Open a new connection inside the callback
-    local_conn = sqlite3.connect('nba_stats.db')
+    local_conn = sqlite3.connect('.venv/nba_stats.db')
     query = f'SELECT * FROM players ORDER BY {col} DESC LIMIT {count}'
     top_n = pd.read_sql(query, local_conn)
     local_conn.close()
