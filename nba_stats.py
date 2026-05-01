@@ -1,11 +1,12 @@
 from nba_api.stats.endpoints import leagueleaders
 import pandas as pd
 import plotly.express as px
-from dash import Dash, dcc, html, Input, Output, State
+from dash import Dash, Input, Output, State
 import sqlite3
+from layout import layout
 
 # Connect to database (creates nba_stats.db file if it doesn't exist)
-conn = sqlite3.connect('.venv/nba_stats.db')
+conn = sqlite3.connect('nba_stats.db')
 
 # Pull data from API and save to database
 df = leagueleaders.LeagueLeaders().get_data_frames()[0]
@@ -37,71 +38,7 @@ team_colors = {
 }
 
 app = Dash(__name__)
-
-app.layout = html.Div([
-    html.H1('GraphMuse', style={'textAlign': 'center', 'fontFamily': 'Arial'}),
-
-    html.Div([
-        html.Div([
-            html.Label('Stat'),
-            dcc.Dropdown(
-                id='stat-dropdown',
-                options=[
-                    {'label': 'Points', 'value': 'PTS'},
-                    {'label': 'Assists', 'value': 'AST'},
-                    {'label': 'Rebounds', 'value': 'REB'},
-                    {'label': 'Steals', 'value': 'STL'},
-                    {'label': 'Blocks', 'value': 'BLK'},
-                ],
-                value='PTS',
-                clearable=False
-            ),
-        ], style={'width': '30%', 'display': 'inline-block', 'margin': '10px'}),
-
-        html.Div([
-            html.Label('Type'),
-            dcc.Dropdown(
-                id='type-dropdown',
-                options=[
-                    {'label': 'Total', 'value': 'total'},
-                    {'label': 'Per Game', 'value': 'per_game'},
-                ],
-                value='total',
-                clearable=False
-            ),
-        ], style={'width': '30%', 'display': 'inline-block', 'margin': '10px'}),
-
-        html.Div([
-            html.Label('Number of Players'),
-            dcc.Input(
-                id='count-input',
-                type='number',
-                value=10,
-                min=1,
-                max=50,
-                step=1,
-                style={'width': '100%', 'padding': '8px', 'fontSize': '14px'}
-            ),
-        ], style={'width': '30%', 'display': 'inline-block', 'margin': '10px', 'verticalAlign': 'top'}),
-
-    ], style={'textAlign': 'center'}),
-
-    html.Div([
-        html.Button('Generate', id='generate-button', n_clicks=0, style={
-            'padding': '10px 30px',
-            'fontSize': '16px',
-            'backgroundColor': '#007AC1',
-            'color': 'white',
-            'border': 'none',
-            'borderRadius': '5px',
-            'cursor': 'pointer',
-            'marginTop': '10px'
-        })
-    ], style={'textAlign': 'center'}),
-
-    dcc.Graph(id='bar-chart')
-])
-
+app.layout = layout
 
 @app.callback(
     Output('bar-chart', 'figure'),
@@ -116,8 +53,7 @@ def update_chart(n_clicks, stat, type, count):
 
     col = f'{stat}_PG' if type == 'per_game' else stat
 
-    # Open a new connection inside the callback
-    local_conn = sqlite3.connect('.venv/nba_stats.db')
+    local_conn = sqlite3.connect('nba_stats.db')
     query = f'SELECT * FROM players ORDER BY {col} DESC LIMIT {count}'
     top_n = pd.read_sql(query, local_conn)
     local_conn.close()

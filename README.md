@@ -11,7 +11,6 @@ A Python web app that visualizes NBA player statistics using real-time data.
 ## Built With
 - Python
 - Pandas
-- NumPy
 - SQL (sqlite3)
 - Plotly
 - Dash
@@ -20,10 +19,8 @@ A Python web app that visualizes NBA player statistics using real-time data.
 ## How to Run
 
 1. Clone the repo
-2. Install dependencies:
-   pip install nba_api pandas plotly dash
-3. Run the app:
-   python nba_stats.py
+2. Install dependencies: `pip install -r requirements.txt`
+3. Run the app: `python nba_stats.py`
 4. Open your browser and go to http://127.0.0.1:8050
 
 ## Status
