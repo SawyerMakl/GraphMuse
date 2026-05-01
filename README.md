@@ -27,7 +27,7 @@ A Python web app that visualizes NBA player statistics using real-time data.
 4. Open your browser and go to http://127.0.0.1:8050
 
 ## Status
-Work in progress — actively being developed.
+Work in progress
 
 ## Roadmap
 - Predictive modeling for player stats and game outcomes
