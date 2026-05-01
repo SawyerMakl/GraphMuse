@@ -7,7 +7,7 @@ import sqlite3
 # Connect to database (creates nba_stats.db file if it doesn't exist)
 conn = sqlite3.connect('.venv/nba_stats.db')
 
-# Pull fresh data from API and save to database
+# Pull data from API and save to database
 df = leagueleaders.LeagueLeaders().get_data_frames()[0]
 
 # Calculate per game stats
@@ -20,10 +20,9 @@ df['BLK_PG'] = (df['BLK'] / df['GP']).round(2)
 # Save to SQL database
 df.to_sql('players', conn, if_exists='replace', index=False)
 
-# From this point on, read from the database instead of the API
+# Makes sure data is read from database, not API
 df = pd.read_sql('SELECT * FROM players', conn)
 
-# Team colors
 team_colors = {
     'ATL': '#E03A3E', 'BOS': '#007A33', 'BKN': '#000000',
     'CHA': '#1D1160', 'CHI': '#CE1141', 'CLE': '#860038',
